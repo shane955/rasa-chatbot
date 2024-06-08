@@ -1,22 +1,45 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Rasa Chatbot</title>
-    <script src="https://cdn.jsdelivr.net/npm/@botfront/rasa-webchat@0.11.6/lib/index.js"></script>
+    <title>Chatbot</title>
+    <style>
+        #chatbox {
+            width: 400px;
+            height: 500px;
+            border: 1px solid #ccc;
+            overflow: auto;
+        }
+        #userInput {
+            width: 300px;
+        }
+    </style>
 </head>
 <body>
-    <div id="webchat"></div>
+    <div id="chatbox"></div>
+    <input type="text" id="userInput" placeholder="Type a message...">
+    <button onclick="sendMessage()">Send</button>
+
     <script>
-        WebChat.default.init({
-            selector: "#webchat",
-            initPayload: "/get_started",
-            interval: 1000, // 1000 ms between each message
-            customData: {"language": "en"}, // arbitrary custom data. Stay minimal as this will be added to the socket
-            socketUrl: "http://localhost:5005", // replace with your Rasa server URL
-            socketPath: "/socket.io/",
-            title: "Rasa Chatbot",
-            subtitle: "How can I help you today?",
-        });
+        const socket = new WebSocket('ws://localhost:8000');
+
+        socket.onmessage = function(event) {
+            const chatbox = document.getElementById('chatbox');
+            const message = document.createElement('div');
+            message.textContent = 'Bot: ' + event.data;
+            chatbox.appendChild(message);
+        };
+
+        function sendMessage() {
+            const input = document.getElementById('userInput');
+            const chatbox = document.getElementById('chatbox');
+            const message = document.createElement('div');
+            message.textContent = 'You: ' + input.value;
+            chatbox.appendChild(message);
+
+            const data = JSON.stringify({ message: input.value });
+            socket.send(data);
+            input.value = '';
+        }
     </script>
 </body>
 </html>
