@@ -12,41 +12,64 @@
             height: 100vh;
             margin: 0;
         }
-        #chatbox {
+        #chatButton {
+            padding: 15px 25px;
+            background-color: #2196f3;
+            color: #fff;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+            font-size: 16px;
+        }
+        #chatButton:hover {
+            background-color: #1976d2;
+        }
+        #chatContainer {
+            display: none;
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
             width: 400px;
             height: 500px;
             border: 1px solid #ccc;
             border-radius: 5px;
             background-color: #fff;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+            flex-direction: column;
+            overflow: hidden;
+        }
+        #chatbox {
+            flex-grow: 1;
             overflow-y: auto;
             padding: 10px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            background-color: #fafafa;
         }
         #chatbox div {
             margin: 5px 0;
             padding: 8px;
             border-radius: 5px;
         }
-        #chatbox div:nth-child(odd) {
+        #chatbox div.bot {
             background-color: #e1f5fe;
             align-self: flex-start;
         }
-        #chatbox div:nth-child(even) {
+        #chatbox div.user {
             background-color: #c8e6c9;
             align-self: flex-end;
         }
         #userInputContainer {
             display: flex;
-            justify-content: center;
-            align-items: center;
-            margin-top: 20px;
+            padding: 10px;
+            border-top: 1px solid #ccc;
+            background-color: #fff;
         }
         #userInput {
-            width: 300px;
+            flex-grow: 1;
             padding: 10px;
             border: 1px solid #ccc;
             border-radius: 5px;
-            box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+            margin-right: 10px;
         }
         #sendButton {
             padding: 10px 15px;
@@ -55,19 +78,31 @@
             background-color: #2196f3;
             color: #fff;
             cursor: pointer;
-            margin-left: 10px;
-            box-shadow: 0 1px 2px rgba(0,0,0,0.1);
         }
         #sendButton:hover {
             background-color: #1976d2;
         }
+        #closeButton {
+            position: absolute;
+            top: 5px;
+            right: 10px;
+            font-size: 18px;
+            background: none;
+            border: none;
+            cursor: pointer;
+        }
     </style>
 </head>
 <body>
-    <div id="chatbox"></div>
-    <div id="userInputContainer">
-        <input type="text" id="userInput" placeholder="Type a message...">
-        <button id="sendButton" onclick="sendMessage()">Send</button>
+    <button id="chatButton" onclick="toggleChat()">Chat with us</button>
+
+    <div id="chatContainer">
+        <button id="closeButton" onclick="toggleChat()">✖</button>
+        <div id="chatbox"></div>
+        <div id="userInputContainer">
+            <input type="text" id="userInput" placeholder="Type a message...">
+            <button id="sendButton" onclick="sendMessage()">Send</button>
+        </div>
     </div>
 
     <script>
@@ -76,6 +111,7 @@
         socket.onmessage = function(event) {
             const chatbox = document.getElementById('chatbox');
             const message = document.createElement('div');
+            message.classList.add('bot');
             const data = JSON.parse(event.data);
 
             if (data.text) {
@@ -93,6 +129,7 @@
             const input = document.getElementById('userInput');
             const chatbox = document.getElementById('chatbox');
             const message = document.createElement('div');
+            message.classList.add('user');
             message.textContent = 'You: ' + input.value;
             chatbox.appendChild(message);
 
@@ -100,6 +137,11 @@
             socket.send(data);
             input.value = '';
             chatbox.scrollTop = chatbox.scrollHeight;
+        }
+
+        function toggleChat() {
+            const chatContainer = document.getElementById('chatContainer');
+            chatContainer.style.display = chatContainer.style.display === 'none' || chatContainer.style.display === '' ? 'flex' : 'none';
         }
     </script>
 </body>
