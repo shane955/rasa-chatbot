@@ -3,21 +3,72 @@
 <head>
     <title>Chatbot</title>
     <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
         #chatbox {
             width: 400px;
             height: 500px;
             border: 1px solid #ccc;
-            overflow: auto;
+            border-radius: 5px;
+            background-color: #fff;
+            overflow-y: auto;
+            padding: 10px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        #chatbox div {
+            margin: 5px 0;
+            padding: 8px;
+            border-radius: 5px;
+        }
+        #chatbox div:nth-child(odd) {
+            background-color: #e1f5fe;
+            align-self: flex-start;
+        }
+        #chatbox div:nth-child(even) {
+            background-color: #c8e6c9;
+            align-self: flex-end;
+        }
+        #userInputContainer {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-top: 20px;
         }
         #userInput {
             width: 300px;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+        }
+        #sendButton {
+            padding: 10px 15px;
+            border: none;
+            border-radius: 5px;
+            background-color: #2196f3;
+            color: #fff;
+            cursor: pointer;
+            margin-left: 10px;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+        }
+        #sendButton:hover {
+            background-color: #1976d2;
         }
     </style>
 </head>
 <body>
     <div id="chatbox"></div>
-    <input type="text" id="userInput" placeholder="Type a message...">
-    <button onclick="sendMessage()">Send</button>
+    <div id="userInputContainer">
+        <input type="text" id="userInput" placeholder="Type a message...">
+        <button id="sendButton" onclick="sendMessage()">Send</button>
+    </div>
 
     <script>
         const socket = new WebSocket('ws://localhost:8000');
@@ -25,8 +76,17 @@
         socket.onmessage = function(event) {
             const chatbox = document.getElementById('chatbox');
             const message = document.createElement('div');
-            message.textContent = 'Bot: ' + event.data;
+            const data = JSON.parse(event.data);
+
+            if (data.text) {
+                message.textContent = 'Bot: ' + data.text;
+            } else {
+                console.error('Received invalid message format from server:', data);
+                return;
+            }
+
             chatbox.appendChild(message);
+            chatbox.scrollTop = chatbox.scrollHeight;
         };
 
         function sendMessage() {
@@ -39,6 +99,7 @@
             const data = JSON.stringify({ message: input.value });
             socket.send(data);
             input.value = '';
+            chatbox.scrollTop = chatbox.scrollHeight;
         }
     </script>
 </body>
