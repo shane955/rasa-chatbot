@@ -1,6 +1,8 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Chatbot</title>
     <style>
         body {
@@ -21,9 +23,15 @@
             cursor: pointer;
             box-shadow: 0 2px 4px rgba(0,0,0,0.2);
             font-size: 16px;
+            display: flex;
+            align-items: center;
         }
         #chatButton:hover {
             background-color: #1976d2;
+        }
+        #chatButton .icon {
+            margin-right: 10px;
+            font-size: 20px;
         }
         #chatContainer {
             display: none;
@@ -94,7 +102,9 @@
     </style>
 </head>
 <body>
-    <button id="chatButton" onclick="toggleChat()">Chat with us</button>
+    <button id="chatButton" onclick="toggleChat()">
+        <span class="icon">&#x1F916;</span> Chat with us
+    </button>
 
     <div id="chatContainer">
         <button id="closeButton" onclick="toggleChat()">✖</button>
@@ -146,3 +156,4 @@
     </script>
 </body>
 </html>
+
